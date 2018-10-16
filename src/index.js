@@ -130,9 +130,12 @@ const service = async () => {
 
 const start = async () => {
   await mongoose.connect(dbUrl, { useNewUrlParser: true });
-  await service();
+
+  if (!fs.existsSync(dataFolder))
+    fs.mkdirSync(dataFolder);
 
   bot.startPolling();
+  await service();
 };
 
 

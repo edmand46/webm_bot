@@ -1,8 +1,4 @@
 {
-  "name": "webm_bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2",
     "mongoose": "^5.3.1",
@@ -11,9 +7,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js"
   },
   "author": "Eduard Kargin (@edmand46)",
-  "license": "MIT"
+  "license": "MIT",
+  "private": true
 }
