@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 const mongoose = require('mongoose');
+
 const { dbUrl, dataFolder, limit, startMessage, time, token } = require('./config');
 
 const User = mongoose.model('user', {
@@ -13,6 +14,7 @@ const User = mongoose.model('user', {
   groupID: String,
   count: Number,
 });
+
 
 
 // Formats
@@ -92,7 +94,7 @@ const convertFile = (file, output, progress) => new Promise((resolve, reject) =>
 
 const getFromQueue = async () => {
   console.log('get from queue');
-  const item = queue.pop();
+  const item = queue.shift();
   const { url, ctx } = item;
   const { from: { id } } = ctx;
 
