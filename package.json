@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cross-env": "^5.2.0",
     "fluent-ffmpeg": "^2.1.2",
     "mongoose": "^5.3.1",
     "request": "^2.88.0",
@@ -9,7 +10,8 @@
   "scripts": {
     "start": "node src/index.js"
   },
-  "author": "Eduard Kargin (@edmand46)",
+  "author": "Eduard Kargin (t.me/@edmand46)",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "version": "1.0.1"
 }

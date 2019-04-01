@@ -4,6 +4,7 @@ const token = '<token>';
 const dataFolder = 'data';
 const time = 1000;
 const limit = 20;
+const maxFileSize = 10;
 
 const startMessage = `
   Hello, this bot is for uploading webm, mp4 videos by link to channel.
@@ -19,4 +20,5 @@ module.exports = {
   time,
   limit,
   startMessage,
+  maxFileSize,
 };
