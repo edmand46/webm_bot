@@ -2,7 +2,7 @@
 ![png](images/logo.jpg)
 
 ## Overview
-Telegram bot that receive links with video in formats(mp4|webm), download, convert if needed, and upload to telegram channel as video messages.
+Telegram bot that receives links with video in two formats(mp4|webm), downloads, converts if needed, and uploads to telegram channel as video messages.
  
 ### Requirements
 * NodeJS >= 8
@@ -23,7 +23,7 @@ You can set "channel" or "chat" mode with command ```/set_mode <mode>```
 
 
 #### Channel settings
-For use this bot with channel mode you are need set channel 
+For use this bot with channel mode you need to set channel 
 1) Add this bot as Admin to your channel
 2) Set your channel by command ```/set_channel @channel_name```
 3) Set mode channel by command ```/set_mode channel```
