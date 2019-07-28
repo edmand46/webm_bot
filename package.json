@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "cross-env": "^5.2.0",
+    "dotenv": "^7.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "mongoose": "^5.3.1",
     "request": "^2.88.0",
@@ -8,7 +9,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node src/index.js"
+    "dev": "cross-env enviroment=local node src/index.js",
+    "prod": "cross-env enviroment=prod pm2 start src/index.js --name webm_bot"
   },
   "author": "Eduard Kargin (t.me/@edmand46)",
   "license": "MIT",
