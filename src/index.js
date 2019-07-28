@@ -5,7 +5,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const { CHAT_MODE } = require("./constants");
 
-const { dbUrl, dataFolder, startMessage, time, token, maxFileSize, supportedFormats } = require('./config');
+const { dbUrl, dataFolder, startMessage, time, token, maxFileSize, convertibleFormats, supportedFormats } = require('./config');
 const { User } = require('./model');
 const { downloadFile, convertFile, getFileInfo, readFile, throttle } = require('./utils');
 const commands = require('./commands');
