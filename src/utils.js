@@ -39,7 +39,21 @@ const getFileInfo = async (file) => new Promise((resolve, reject) => {
   });
 });
 
+const throttle = (f, t) => {
+  return function (args) {
+    const lastCallTime = this.lastCall;
+    const currentTime = Date.now();
+    const delta = currentTime - lastCallTime;
+    if (lastCallTime === undefined || (delta) > t) {
+      this.lastCall = currentTime;
+      f(args);
+    }
+  }
+};
+
+
 module.exports = {
+  throttle,
   downloadFile,
   readFile,
   convertFile,

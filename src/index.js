@@ -7,7 +7,7 @@ const { CHAT_MODE } = require("./constants");
 
 const { dbUrl, dataFolder, startMessage, time, token, maxFileSize, supportedFormats } = require('./config');
 const { User } = require('./model');
-const { downloadFile, convertFile, getFileInfo, readFile } = require('./utils');
+const { downloadFile, convertFile, getFileInfo, readFile, throttle } = require('./utils');
 const commands = require('./commands');
 
 const bot = new Telegraf(token);
@@ -71,6 +71,8 @@ const loggingProgress = ({ chat_id, message_id, url }) => async (p) => {
   await telegram.editMessageText(chat_id, message_id, null, template.replace(URL, url).replace(PERCENT, percent));
 };
 
+const loggingThrottled = throttle(loggingProgress, 1000);
+
 const URL = '%url%';
 const PERCENT = '%percent%';
 const template = `Started processing ${URL} (${PERCENT}%)`;
@@ -112,7 +114,7 @@ const getFromQueue = async () => {
       await convertFile({
         input: pathToFile,
         output: finalFilename,
-        logging: loggingProgress({ chat_id, message_id, url }),
+        logging: loggingThrottled({ chat_id, message_id, url }),
         resize: isConverted,
       });
     }
