@@ -6,7 +6,7 @@ const path = require('path');
 const { CHAT_MODE } = require("./constants");
 
 const { dbUrl, dataFolder, startMessage, time, token, maxFileSize, convertibleFormats, supportedFormats } = require('./config');
-const { User } = require('./db/connection');
+const { User } = require('./db/user.entity');
 const { downloadFile, convertFile, getFileInfo, readFile } = require('./utils');
 const commands = require('./commands');
 
@@ -46,18 +46,6 @@ const handleFormat = (format) => async ctx => {
 };
 
 const addQueue = async ({ id, message, format, ctx }) => {
-  const dbUser = await User.findOne({ where: { telegramID: `${id}` } });
-
-  if (dbUser === undefined || dbUser === null) {
-    console.error(`User not found ${id}`);
-    return
-  }
-
-  if (!dbUser.groupID) {
-    await ctx.reply('Channel not selected, select channel by command /set_channel @channel');
-    return;
-  }
-
   const urls = message.match(/(http[\s\S]*?)\.(mp4|webm)/ig);
   if (!urls || urls.length === 0) return;
 
@@ -92,9 +80,14 @@ const getFromQueue = async () => {
   const finalFilename = isConverted ? `${dataFolder}/converted_${newFilename}` : `${dataFolder}/${newFilename}`;
 
   try {
+    let chatID = chat_id;
+
     const dbUser = await User.findOne({ where: { telegramID: id } });
-    const { mode, groupID } = dbUser;
-    const chatID = mode === CHAT_MODE ? ctx.chat.id : groupID;
+    if (dbUser) {
+      const { mode, groupID } = dbUser;
+      chatID = mode === CHAT_MODE ? ctx.chat.id : groupID;
+    }
+
     await downloadFile(url, pathToFile);
 
     const extension = path.extname(url);
@@ -154,9 +147,27 @@ const start = async () => {
 
 bot.start(ctx => ctx.reply(startMessage));
 
+bot.on('document', async (ctx) => {
+  const fileName = ctx.message.document.file_name;
+  const fileFormats = supportedFormats.filter(format => {
+    const regexp = new RegExp(format, 'i')
+    return regexp.test(fileName);
+  });
+
+  if (fileFormats.length === 0) return;
+
+  const fileId = ctx.message.document.file_id;
+  const fileLink = await telegram.getFileLink(fileId);
+
+  queue.push({ url: fileLink, ctx, format: MP4 });
+
+  await ctx.reply(`Added to queue, total ${queue.length} items`);
+});
+
 commands(bot);
 
 supportedFormats.forEach(format => bot.hears(new RegExp(format, 'i'), selectFormat));
 actions.forEach(action => bot.action(action, handleFormat(action)));
+
 
 start().then(console.log).catch(console.error);

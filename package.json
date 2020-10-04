@@ -6,7 +6,7 @@
     "request": "^2.88.0",
     "sequelize": "^6.3.5",
     "sqlite3": "^5.0.0",
-    "telegraf": "^3.24.0"
+    "telegraf": "^3.38.0"
   },
   "devDependencies": {},
   "scripts": {
