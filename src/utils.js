@@ -26,7 +26,7 @@ const convertFile = (parameters) => new Promise((resolve, reject) => {
     task = task.addOutputOption('-vf', 'scale=w=400:h=400:force_original_aspect_ratio=2,crop=400:400');
 
   task.on('end', resolve)
-    .on('progress', (p) => console.log(p.percent))
+    .on('progress', ({ percent }) => logging(percent))
     .on('error', reject)
     .saveToFile(output);
 });

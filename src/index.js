@@ -2,6 +2,7 @@ const { setupDB } = require("./db/connection");
 const { MP4 } = require('./constants');
 const Telegraf = require('telegraf');
 const fs = require('fs');
+const { throttle } = require('lodash');
 const path = require('path');
 const { CHAT_MODE } = require("./constants");
 
@@ -56,7 +57,9 @@ const addQueue = async ({ id, message, format, ctx }) => {
 
 const loggingProgress = ({ chat_id, message_id, url }) => async (p) => {
   const percent = Math.floor(p);
-  await telegram.editMessageText(chat_id, message_id, null, template.replace(URL, url).replace(PERCENT, percent));
+  try {
+    await telegram.editMessageText(chat_id, message_id, null, template.replace(URL, url).replace(PERCENT, percent));
+  } catch (e) {}
 };
 
 const URL = '%url%';
@@ -89,7 +92,7 @@ const getFromQueue = async () => {
     }
 
     await downloadFile(url, pathToFile);
-
+    const log = loggingProgress({ chat_id, message_id, url });
     const extension = path.extname(url);
     if (convertibleFormats.includes(extension) || isConverted) {
       const fileInfo = await getFileInfo(pathToFile);
@@ -105,10 +108,12 @@ const getFromQueue = async () => {
       await convertFile({
         input: pathToFile,
         output: finalFilename,
-        // logging: loggingThrottled({ chat_id, message_id, url }),
+        logging: throttle(log, 500),
         resize: isConverted,
       });
     }
+
+    await log(100);
 
     const file = await readFile(finalFilename);
     console.log(`Upload to telegram video from ${username}`);
