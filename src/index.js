@@ -1,3 +1,5 @@
+
+const { setupDB } = require("./db/connection");
 const { MP4 } = require('./constants');
 const Telegraf = require('telegraf');
 const fs = require('fs');
@@ -6,8 +8,8 @@ const mongoose = require('mongoose');
 const { CHAT_MODE } = require("./constants");
 
 const { dbUrl, dataFolder, startMessage, time, token, maxFileSize, convertibleFormats, supportedFormats } = require('./config');
-const { User } = require('./model');
-const { downloadFile, convertFile, getFileInfo, readFile, throttle } = require('./utils');
+const { User } = require('./db/connection');
+const { downloadFile, convertFile, getFileInfo, readFile } = require('./utils');
 const commands = require('./commands');
 
 const bot = new Telegraf(token);
@@ -46,7 +48,7 @@ const handleFormat = (format) => async ctx => {
 };
 
 const addQueue = async ({ id, message, format, ctx }) => {
-  const dbUser = await User.findOne({ telegramID: `${id}` });
+  const dbUser = await User.findOne({ where: { telegramID: `${id}` } });
 
   if (dbUser === undefined || dbUser === null) {
     console.error(`User not found ${id}`);
@@ -71,8 +73,6 @@ const loggingProgress = ({ chat_id, message_id, url }) => async (p) => {
   await telegram.editMessageText(chat_id, message_id, null, template.replace(URL, url).replace(PERCENT, percent));
 };
 
-const loggingThrottled = throttle(loggingProgress, 1000);
-
 const URL = '%url%';
 const PERCENT = '%percent%';
 const template = `Started processing ${URL} (${PERCENT}%)`;
@@ -94,7 +94,7 @@ const getFromQueue = async () => {
   const finalFilename = isConverted ? `${dataFolder}/converted_${newFilename}` : `${dataFolder}/${newFilename}`;
 
   try {
-    const dbUser = await User.findOne({ telegramID: id });
+    const dbUser = await User.findOne({ where: { telegramID: id } });
     const { mode, groupID } = dbUser;
     const chatID = mode === CHAT_MODE ? ctx.chat.id : groupID;
     await downloadFile(url, pathToFile);
@@ -114,7 +114,7 @@ const getFromQueue = async () => {
       await convertFile({
         input: pathToFile,
         output: finalFilename,
-        logging: loggingThrottled({ chat_id, message_id, url }),
+        // logging: loggingThrottled({ chat_id, message_id, url }),
         resize: isConverted,
       });
     }
@@ -144,7 +144,7 @@ const service = async () => {
 };
 
 const start = async () => {
-  await mongoose.connect(dbUrl, { useNewUrlParser: true });
+  await setupDB();
 
   if (!fs.existsSync(dataFolder))
     fs.mkdirSync(dataFolder);

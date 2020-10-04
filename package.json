@@ -3,8 +3,9 @@
     "cross-env": "^5.2.0",
     "dotenv": "^7.0.0",
     "fluent-ffmpeg": "^2.1.2",
-    "mongoose": "^5.3.1",
     "request": "^2.88.0",
+    "sequelize": "^6.3.5",
+    "sqlite3": "^5.0.0",
     "telegraf": "^3.24.0"
   },
   "devDependencies": {},

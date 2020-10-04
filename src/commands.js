@@ -1,6 +1,6 @@
 const { CHANNEL_MODE } = require('./constants');
 const { limit, supportedModes } = require('./config');
-const { User } = require('./model');
+const { User } = require('./db/user.entity');
 
 const setMode = async (ctx) => {
   const { text, from: { id, first_name, username } } = ctx.message;
@@ -11,18 +11,19 @@ const setMode = async (ctx) => {
       return;
     }
 
-    const dbUser = await User.findOne({ telegramID: id });
+    const dbUser = await User.findOne({ where: { telegramID: id } });
     if (dbUser === null) {
       await User.create({
+        firstName: first_name,
         count: limit,
         mode,
         telegramID: `${id}`,
         groupID: '',
         username,
-        first_name,
       });
     } else {
-      await dbUser.updateOne({ mode });
+      dbUser.mode = mode;
+      await dbUser.save();
     }
 
     console.log(`${first_name}(@${username}) select ${mode} mode`);
@@ -45,7 +46,7 @@ const setChannel = async (ctx) => {
       return;
     }
 
-    const dbUser = await User.findOne({ telegramID: id });
+    const dbUser = await User.findOne({ where: { telegramID: id } });
     if (dbUser === null) {
       await User.create({
         count: limit,
@@ -53,14 +54,15 @@ const setChannel = async (ctx) => {
         mode: CHANNEL_MODE,
         telegramID: `${id}`,
         username,
-        first_name,
+        firstName: first_name,
       });
 
       await ctx.reply('Settings saved.');
       return;
     }
 
-    await dbUser.updateOne({ groupID });
+    dbUser.groupID = groupID;
+    await dbUser.save();
 
     console.log(`selected channel ${groupID} by ${first_name} ${username}`);
     await ctx.reply('Settings saved.');

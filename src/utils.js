@@ -26,7 +26,7 @@ const convertFile = (parameters) => new Promise((resolve, reject) => {
     task = task.addOutputOption('-vf', 'scale=w=400:h=400:force_original_aspect_ratio=2,crop=400:400');
 
   task.on('end', resolve)
-    .on('progress', (p) => logging ? logging(p.percent) : console.log(p.percent))
+    .on('progress', (p) => console.log(p.percent))
     .on('error', reject)
     .saveToFile(output);
 });
@@ -39,21 +39,8 @@ const getFileInfo = async (file) => new Promise((resolve, reject) => {
   });
 });
 
-const throttle = (f, t) => {
-  return function (args) {
-    const lastCallTime = this.lastCall;
-    const currentTime = Date.now();
-    const delta = currentTime - lastCallTime;
-    if (lastCallTime === undefined || (delta) > t) {
-      this.lastCall = currentTime;
-      f(args);
-    }
-  }
-};
-
 
 module.exports = {
-  throttle,
   downloadFile,
   readFile,
   convertFile,
