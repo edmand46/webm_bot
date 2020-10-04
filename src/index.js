@@ -1,10 +1,8 @@
-
 const { setupDB } = require("./db/connection");
 const { MP4 } = require('./constants');
 const Telegraf = require('telegraf');
 const fs = require('fs');
 const path = require('path');
-const mongoose = require('mongoose');
 const { CHAT_MODE } = require("./constants");
 
 const { dbUrl, dataFolder, startMessage, time, token, maxFileSize, convertibleFormats, supportedFormats } = require('./config');
