@@ -7,7 +7,7 @@ const sequelize = new Sequelize({
 
 async function setupDB() {
   await sequelize.authenticate();
-  await sequelize.sync({ force: true });
+  await sequelize.sync() ;
 }
 
 module.exports = {
