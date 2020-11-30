@@ -2,6 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const http = require('https');
 const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffprobePath = require('@ffprobe-installer/ffprobe').path;
+
+ffmpeg.setFfprobePath(ffprobePath);
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 const downloadFile = (url, savePath) => new Promise((resolve, reject) => {
   console.log(`Start download file ${path.basename(savePath)}`);

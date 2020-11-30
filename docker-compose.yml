@@ -1,0 +1,10 @@
+version: '3.1'
+
+services:
+  backend:
+    image: repository.edmand46.dev/webm_bot:latest
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - "./data:/usr/src/app/data"
+      - "./db:/usr/src/app/db"

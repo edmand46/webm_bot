@@ -31,14 +31,15 @@ For use this bot with channel mode you need to set channel
 ### Base setup
 
 1) Create telegram bot by [BotFather](https://telegram.me/botfather)
-2) Config app in ```src/config.js```
-3) Install bot
+3) Clone and set variables in .env file
 ``` bash
 # git clone https://github.com/Edisoni/webm_bot webm_bot
 # cd webm_bot
 # npm install
 # npm start
+# mv .env-example .env
 ```
+
 
 ### Screenshot
 ![png](images/example.png)

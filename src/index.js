@@ -100,8 +100,8 @@ const getFromQueue = async () => {
 
       const megabytes = size / (1024 * 1024);
       if (megabytes > maxFileSize) {
-        fs.unlinkSync(finalFilename);
         ctx.reply(`File size to much!`);
+        fs.unlinkSync(pathToFile);
         return;
       }
 
