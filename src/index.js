@@ -26,7 +26,7 @@ const chooseFormat = Telegraf.Extra.markdown().markup(m => m.inlineKeyboard([
 
 const selectFormat = async ctx => {
   const message = ctx.message.text;
-  const urls = message.match(/(http[\s\S]*?)\.(mp4|webm)/ig);
+  const urls = message.match(/(http[\s\S]*?)\.(mp4|webm|mov)/ig);
   if (!urls || urls.length === 0) return;
 
   const items = urls.map(url => ({ url, ctx }));
