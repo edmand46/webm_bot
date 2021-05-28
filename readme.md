@@ -8,10 +8,7 @@ Telegram bot that receives links with video in two formats(mp4|webm), downloads,
  
 ### Requirements
 * NodeJS >= 8
-* Ubuntu 16.04
-* MongoDB 3.x
-* ffmpeg
-
+* Ubuntu >= 16.04
 
 ### Configuration
 
@@ -30,7 +27,7 @@ For use this bot with channel mode you need to set channel
 2) Set your channel by command ```/set_channel @channel_name```
 3) Set mode channel by command ```/set_mode channel```
 
-### Base setup
+### Setup via git
 
 1) Create telegram bot by [BotFather](https://telegram.me/botfather)
 3) Clone and set variables in .env file
@@ -42,6 +39,32 @@ For use this bot with channel mode you need to set channel
 # mv .env-example .env
 ```
 
+### Setup via Docker
+1) Create telegram bot by [BotFather](https://telegram.me/botfather)
+2) Create docker-compose.yml file
+3) Create .env with next variables
+
+.env
+```dotenv
+CONTACT=@edmand46
+TOKEN=<token>
+DATA_FOLDER=data
+LIMIT_PER_USER=20
+MAX_FILE_SIZE=10
+```
+docker-compose.yml
+```dockerfile
+version: '3.1'
+
+services:
+  backend:
+    image: edmand46/webm_bot:latest
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - "./data:/usr/src/app/data"
+      - "./db:/usr/src/app/db"
+```
 
 ### Screenshot
 ![png](images/example.png)
