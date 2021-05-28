@@ -2,3 +2,4 @@
 .env
 data/
 node_modules/
+db/
