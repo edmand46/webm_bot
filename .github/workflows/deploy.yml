@@ -32,7 +32,6 @@ jobs:
           context: .
           push: true
           tags: |
-            docker.pkg.github.com/${{ github.repository }}/webm_bot:${{ github.sha }}
             docker.pkg.github.com/${{ github.repository }}/webm_bot:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
