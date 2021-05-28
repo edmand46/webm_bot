@@ -1,5 +1,6 @@
-# Webm Bot
+# WebM Bot
 [![Build and deploy](https://github.com/edmand46/webm_bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/edmand46/webm_bot/actions/workflows/deploy.yml)
+
 ![png](images/logo.jpg)
 
 ## Overview
