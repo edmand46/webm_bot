@@ -32,8 +32,8 @@ jobs:
           context: .
           push: true
           tags: |
-            docker.pkg.github.com/${{ github.repository }}/octo-image:${{ github.sha }}
-            docker.pkg.github.com/${{ github.repository }}/octo-image:${{ github.ref }}
+            docker.pkg.github.com/${{ github.repository }}/webm_bot:${{ github.sha }}
+            docker.pkg.github.com/${{ github.repository }}/webm_bot:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       - name: Deploy to server
