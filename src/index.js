@@ -1,14 +1,23 @@
-const { setupDB } = require("./db/connection");
-const { MP4 } = require('./constants');
+const {setupDB} = require("./db/connection");
+const {MP4} = require('./constants');
 const Telegraf = require('telegraf');
 const fs = require('fs');
-const { throttle } = require('lodash');
+const {throttle} = require('lodash');
 const path = require('path');
-const { CHAT_MODE } = require("./constants");
+const {CHAT_MODE} = require("./constants");
 
-const { dbUrl, dataFolder, startMessage, time, token, maxFileSize, convertibleFormats, supportedFormats } = require('./config');
-const { User } = require('./db/user.entity');
-const { downloadFile, convertFile, getFileInfo, readFile } = require('./utils');
+const {
+  dbUrl,
+  dataFolder,
+  startMessage,
+  time,
+  token,
+  maxFileSize,
+  convertibleFormats,
+  supportedFormats
+} = require('./config');
+const {User} = require('./db/user.entity');
+const {downloadFile, convertFile, getFileInfo, readFile} = require('./utils');
 const commands = require('./commands');
 
 const bot = new Telegraf(token);
@@ -29,7 +38,7 @@ const selectFormat = async ctx => {
   const urls = message.match(/(http[\s\S]*?)\.(mp4|webm|mov)/ig);
   if (!urls || urls.length === 0) return;
 
-  const items = urls.map(url => ({ url, ctx }));
+  const items = urls.map(url => ({url, ctx}));
   for (let index = 0; index < items.length; index++) {
     const item = items[index];
     await ctx.reply(`Select format for [${item.url}](${item.url})`, chooseFormat);
@@ -37,29 +46,30 @@ const selectFormat = async ctx => {
 };
 
 const handleFormat = (format) => async ctx => {
-  const { from: { id }, message: { text } } = ctx.update.callback_query;
+  const {from: {id}, message: {text}} = ctx.update.callback_query;
   try {
-    await ctx.editMessageReplyMarkup({ reply_markup: { remove_keyboard: true } });
+    await ctx.editMessageReplyMarkup({reply_markup: {remove_keyboard: true}});
   } catch (e) {
     console.error(e);
   }
-  await addQueue({ id, message: text, format, ctx });
+  await addQueue({id, message: text, format, ctx});
 };
 
-const addQueue = async ({ id, message, format, ctx }) => {
+const addQueue = async ({id, message, format, ctx}) => {
   const urls = message.match(/(http[\s\S]*?)\.(mp4|webm)/ig);
   if (!urls || urls.length === 0) return;
 
-  const items = urls.map(url => ({ url, ctx, format }));
+  const items = urls.map(url => ({url, ctx, format}));
   queue.push(...items);
   await ctx.reply(`Added to queue ${items.length} items, total ${queue.length} items`);
 };
 
-const loggingProgress = ({ chat_id, message_id, url }) => async (p) => {
+const loggingProgress = ({chat_id, message_id, url}) => async (p) => {
   const percent = Math.floor(p);
   try {
     await telegram.editMessageText(chat_id, message_id, null, template.replace(URL, url).replace(PERCENT, percent));
-  } catch (e) {}
+  } catch (e) {
+  }
 };
 
 const URL = '%url%';
@@ -70,60 +80,60 @@ const getFromQueue = async () => {
   console.log(`get from queue[${queue.length}]`);
 
   const item = queue.shift();
-  const { url, ctx, format } = item;
-  const { from: { id, username } } = ctx;
+  const {url, ctx, format} = item;
+  const {from: {id, username}} = ctx;
 
   const message = template.replace(URL, url).replace(PERCENT, 0);
-  const { message_id, chat: { id: chat_id } } = await ctx.reply(message);
+  const {message_id, chat: {id: chat_id}} = await ctx.reply(message);
 
-  const isConverted = format === videoNote;
+  const isVideoNote = format === videoNote;
   const fileName = path.basename(url);
   const pathToFile = `${dataFolder}/${fileName}`;
   const newFilename = `${path.parse(fileName).name}${MP4}`;
-  const finalFilename = isConverted ? `${dataFolder}/converted_${newFilename}` : `${dataFolder}/${newFilename}`;
+  const pathToFileConverted = `${dataFolder}/${new Date()}_${newFilename}`;
 
   try {
-    let chatID = chat_id;
+    let chatId = chat_id;
 
-    const dbUser = await User.findOne({ where: { telegramID: id } });
+    const dbUser = await User.findOne({where: {telegramID: id}});
     if (dbUser) {
-      const { mode, groupID } = dbUser;
-      chatID = mode === CHAT_MODE ? ctx.chat.id : groupID;
+      const {mode, groupID} = dbUser;
+      chatId = mode === CHAT_MODE ? ctx.chat.id : groupID;
     }
 
     await downloadFile(url, pathToFile);
-    const log = loggingProgress({ chat_id, message_id, url });
-    const extension = path.extname(url);
-    if (convertibleFormats.includes(extension) || isConverted) {
-      const fileInfo = await getFileInfo(pathToFile);
-      const { format: { size } } = fileInfo;
+    const log = loggingProgress({chat_id, message_id, url});
 
-      const megabytes = size / (1024 * 1024);
-      if (megabytes > maxFileSize) {
-        ctx.reply(`File size to much!`);
-        fs.unlinkSync(pathToFile);
-        return;
-      }
 
-      await convertFile({
-        input: pathToFile,
-        output: finalFilename,
-        logging: throttle(log, 500),
-        resize: isConverted,
-      });
+    const fileInfo = await getFileInfo(pathToFile);
+    const {format: {size}} = fileInfo;
+
+    const megabytes = size / (1024 * 1024);
+    if (megabytes > maxFileSize) {
+      ctx.reply(`File size to much!`);
+      fs.unlinkSync(pathToFile);
+      return;
     }
+
+    await convertFile({
+      input: pathToFile,
+      output: pathToFileConverted,
+      logging: throttle(log, 1000),
+      resize: isVideoNote,
+    });
 
     await log(100);
 
-    const file = await readFile(finalFilename);
+    const file = await readFile(pathToFileConverted);
+
     console.log(`Upload to telegram video from ${username}`);
 
-    if (isConverted)
-      await telegram.sendVideoNote(chatID, { source: file });
+    if (isVideoNote)
+      await telegram.sendVideoNote(chatId, { source: file });
     else
-      await telegram.sendVideo(chatID, { source: file });
+      await telegram.sendVideo(chatId, { source: file });
 
-    fs.unlinkSync(finalFilename);
+    fs.unlinkSync(pathToFileConverted);
   } catch (e) {
     console.log(e);
     await ctx.reply(`Failed to download or convert ${url}`);
@@ -164,7 +174,7 @@ bot.on('document', async (ctx) => {
   const fileId = ctx.message.document.file_id;
   const fileLink = await telegram.getFileLink(fileId);
 
-  queue.push({ url: fileLink, ctx, format: MP4 });
+  queue.push({url: fileLink, ctx, format: MP4});
 
   await ctx.reply(`Added to queue, total ${queue.length} items`);
 });
