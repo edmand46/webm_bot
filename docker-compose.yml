@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   backend:
-    image: docker.pkg.github.com/edmand46/webm_bot:latest
+    image: ghcr.io/edmand46/webm_bot:latest
     restart: unless-stopped
     env_file: .env
     volumes:
