@@ -1,21 +1,23 @@
-FROM node:14-alpine as build
+FROM jrottenberg/ffmpeg:4.1-ubuntu
 
-WORKDIR /usr/src/app
+USER root
 
-COPY package*.json ./
+RUN apt-get update
+RUN apt-get -y install curl gnupg
+RUN curl -sL https://deb.nodesource.com/setup_14.x  | bash -
+RUN apt-get -y install nodejs
+RUN node -v
+RUN npm -v
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+ENV NODE_WORKDIR /home/node/app
+
+WORKDIR $NODE_WORKDIR
+ADD . $NODE_WORKDIR
+RUN mkdir -p $NODE_WORKDIR/tmp
 
 RUN npm install
 
-COPY . .
-
-FROM node:14-alpine
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-# copy from build image
-COPY --from=build /usr/src/app/src ./src
-COPY --from=build /usr/src/app/node_modules ./node_modules
-
-CMD [ "node", "src/index.js" ]
+ENTRYPOINT [ "npm", "start" ]

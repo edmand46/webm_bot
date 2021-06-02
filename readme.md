@@ -1,8 +1,6 @@
 # WebM Bot
 [![Build and deploy](https://github.com/edmand46/webm_bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/edmand46/webm_bot/actions/workflows/deploy.yml)
 
-![png](images/logo.jpg)
-
 ## Overview
 Telegram bot that receives links with video in two formats(mp4|webm), downloads, converts if needed, and uploads to telegram channel as video messages.
 
