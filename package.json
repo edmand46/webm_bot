@@ -5,7 +5,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "lodash": "^4.17.20",
     "request": "^2.88.0",
-    "sequelize": "^6.3.5",
+    "sequelize": "^6.29.0",
     "sqlite3": "^5.0.0",
     "telegraf": "^3.38.0"
   },
